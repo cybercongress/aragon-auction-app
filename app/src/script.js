@@ -10,17 +10,17 @@ app.store(async (state, { event }) => {
   // Initial state
   if (state == null) {
     nextState = {
-      count: await getValue(),
+      // count: await getValue(),
     }
   }
 
   switch (event) {
-    case 'Increment':
-      nextState = { ...nextState, count: await getValue() }
-      break
-    case 'Decrement':
-      nextState = { ...nextState, count: await getValue() }
-      break
+    // case 'Increment':
+    //   nextState = { ...nextState, count: await getValue() }
+    //   break
+    // case 'Decrement':
+    //   nextState = { ...nextState, count: await getValue() }
+    //   break
     case events.SYNC_STATUS_SYNCING:
       nextState = { ...nextState, isSyncing: true }
       break
@@ -32,6 +32,6 @@ app.store(async (state, { event }) => {
   return nextState
 })
 
-async function getValue() {
-  return parseInt(await app.call('value').toPromise(), 10)
-}
+// async function getValue() {
+//   return parseInt(await app.call('value').toPromise(), 10)
+// }

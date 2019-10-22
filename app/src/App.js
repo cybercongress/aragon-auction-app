@@ -11,14 +11,14 @@ function App() {
     <Main>
       <BaseLayout>
         {isSyncing && <Syncing />}
-        <Count>Count: {count}</Count>
+        {/* <Count>Count: {count}</Count> */}
         <Buttons>
-          <Button mode="secondary" onClick={() => api.decrement(1).toPromise()}>
+          {/* <Button mode="secondary" onClick={() => api.decrement(1).toPromise()}>
             Decrement
           </Button>
           <Button mode="secondary" onClick={() => api.increment(1).toPromise()}>
             Increment
-          </Button>
+          </Button> */}
         </Buttons>
       </BaseLayout>
     </Main>

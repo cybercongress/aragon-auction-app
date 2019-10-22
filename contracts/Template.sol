@@ -15,12 +15,13 @@ import "@aragon/os/contracts/apm/Repo.sol";
 import "@aragon/os/contracts/lib/ens/ENS.sol";
 import "@aragon/os/contracts/lib/ens/PublicResolver.sol";
 import "@aragon/os/contracts/apm/APMNamehash.sol";
+// import "@aragon/os/contracts/common/TimeHelpers.sol";
 
 import "@aragon/apps-voting/contracts/Voting.sol";
 import "@aragon/apps-token-manager/contracts/TokenManager.sol";
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
 
-import "./CounterApp.sol";
+import "./Auction.sol";
 
 
 contract TemplateBase is APMNamehash {
@@ -51,7 +52,7 @@ contract TemplateBase is APMNamehash {
 }
 
 
-contract Template is TemplateBase {
+contract Template is TemplateBase, TimeHelpers {
     MiniMeTokenFactory tokenFactory;
 
     uint64 constant PCT = 10 ** 16;
@@ -71,25 +72,29 @@ contract Template is TemplateBase {
         bytes32 votingAppId = apmNamehash("voting");
         bytes32 tokenManagerAppId = apmNamehash("token-manager");
 
-        CounterApp app = CounterApp(dao.newAppInstance(appId, latestVersionAppBase(appId)));
+        Auction app = Auction(dao.newAppInstance(appId, latestVersionAppBase(appId)));
         Voting voting = Voting(dao.newAppInstance(votingAppId, latestVersionAppBase(votingAppId)));
         TokenManager tokenManager = TokenManager(dao.newAppInstance(tokenManagerAppId, latestVersionAppBase(tokenManagerAppId)));
 
-        MiniMeToken token = tokenFactory.createCloneToken(MiniMeToken(0), 0, "App token", 0, "APP", true);
+        MiniMeToken token = tokenFactory.createCloneToken(MiniMeToken(0), 0, "Euler2 Test Token", 0, "EUL2", true);
         token.changeController(tokenManager);
 
         // Initialize apps
-        app.initialize();
+        app.initialize(uint256(4), getTimestamp() + uint256(100), getTimestamp() + uint256(1100), token, tokenManager);
         tokenManager.initialize(token, true, 0);
-        voting.initialize(token, 50 * PCT, 20 * PCT, 1 days);
+        voting.initialize(token, 50 * PCT, 20 * PCT, 1 minutes);
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
-        tokenManager.mint(root, 1); // Give one token to root
+        acl.createPermission(this, app, app.CREATOR_ROLE(), this);
+
+        tokenManager.mint(root, 1000); // Give 1000 token to root
+        tokenManager.mint(address(app), 100); // Give 100 token to auction
+
+        // Activate auction
+        app.load(uint256(20)); // #0 day - 20, #1/2/3/4 - 20
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
-        acl.createPermission(voting, app, app.INCREMENT_ROLE(), voting);
-        acl.createPermission(ANY_ENTITY, app, app.DECREMENT_ROLE(), root);
         acl.grantPermission(voting, tokenManager, tokenManager.MINT_ROLE());
 
         // Clean up permissions
@@ -100,6 +105,8 @@ contract Template is TemplateBase {
         acl.grantPermission(root, acl, acl.CREATE_PERMISSIONS_ROLE());
         acl.revokePermission(this, acl, acl.CREATE_PERMISSIONS_ROLE());
         acl.setPermissionManager(root, acl, acl.CREATE_PERMISSIONS_ROLE());
+
+        acl.revokePermission(this, app, app.CREATOR_ROLE());
 
         emit DeployInstance(dao);
     }

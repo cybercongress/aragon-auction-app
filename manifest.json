@@ -1,7 +1,7 @@
 {
-  "name": "Counter",
-  "author": "Placeholder-author",
-  "description": "An application for Aragon",
+  "name": "Auction",
+  "author": "cyber~Congress",
+  "description": "Auction",
   "details_url": "/meta/details.md",
   "source_url": "https://<placeholder-repository-url>",
   "icons": [
