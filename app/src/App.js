@@ -5,20 +5,30 @@ import styled from 'styled-components'
 
 function App() {
   const { api, appState } = useAragonApi()
-  const { count, isSyncing } = appState
-  console.log(count, isSyncing)
+  const { 
+    openTime,
+    startTime,
+    numberOfDays,
+    createFirstDay,
+    createPerDay,
+    foundation,
+    isSyncing 
+  } = appState
+  console.log(isSyncing)
   return (
     <Main>
       <BaseLayout>
         {isSyncing && <Syncing />}
-        {/* <Count>Count: {count}</Count> */}
+        <Count>openTime: {openTime}</Count>
+        <Count>startTime: {startTime}</Count>
+        <Count>numberOfDays: {numberOfDays}</Count>
+        <Count>createFirstDay: {createFirstDay}</Count>
+        <Count>createPerDay: {createPerDay}</Count>
+        <Count>foundation: {foundation}</Count>
         <Buttons>
-          {/* <Button mode="secondary" onClick={() => api.decrement(1).toPromise()}>
-            Decrement
+          <Button mode="secondary" onClick={() => api.buy({value: 100000000000000000}).toPromise()}>
+            Buy
           </Button>
-          <Button mode="secondary" onClick={() => api.increment(1).toPromise()}>
-            Increment
-          </Button> */}
         </Buttons>
       </BaseLayout>
     </Main>

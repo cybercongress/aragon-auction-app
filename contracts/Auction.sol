@@ -70,15 +70,18 @@ contract Auction is AragonApp, DSMath {
     }
 
     function load(uint256 _createFirstDay) public auth(CREATOR_ROLE) {
-        require(token.balanceOf(address(this)) > 0, ERROR_ZERO_BALANCE);
         require(_createFirstDay > 0, ERROR_ZERO_FIRST_DAY);
-        require(token.balanceOf(address(this)) > _createFirstDay, ERROR_NOT_ENOUGH_BALANCE);
+
+        uint256 selfBalance = token.balanceOf(address(this));
+        require(selfBalance > 0, ERROR_ZERO_BALANCE);
+        require(selfBalance > _createFirstDay, ERROR_NOT_ENOUGH_BALANCE);
+
         createFirstDay = _createFirstDay;
-        createPerDay = sub(token.balanceOf(address(this)), createFirstDay) / numberOfDays;
+        createPerDay = sub(selfBalance, _createFirstDay) / numberOfDays;
     }
 
     function time() public view returns (uint256) {
-        return block.timestamp;
+        return block.timestamp; // solium-disable-line security/no-block-members
     }
 
     function today() public view returns (uint256) {
@@ -86,7 +89,7 @@ contract Auction is AragonApp, DSMath {
     }
 
     function dayFor(uint256 timestamp) public view returns (uint256) {
-        return timestamp < startTime ? 0 : sub(timestamp, startTime) / 5 minutes + 1;
+        return timestamp < startTime ? 0 : sub(timestamp, startTime) / 1 hours + 1;
     }
 
     function createOnDay(uint256 day) public view returns (uint256) {

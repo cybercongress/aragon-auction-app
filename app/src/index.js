@@ -5,9 +5,14 @@ import App from './App'
 
 const reducer = state => {
   if (state === null) {
-    return { 
-      // count: 0, 
-      isSyncing: true 
+    return {
+      openTime: 0,
+      startTime: 0,
+      numberOfDays: 0,
+      createFirstDay: 0,
+      createPerDay: 0,
+      foundation: "",
+      isSyncing: true,
     }
   }
   return state
