@@ -29,6 +29,9 @@ function App() {
           <Button mode="secondary" onClick={() => api.buy({value: 100000000000000000}).toPromise()}>
             Buy
           </Button>
+          <Button mode="secondary" onClick={() => api.load(20).toPromise()}>
+            Load
+          </Button>
         </Buttons>
       </BaseLayout>
     </Main>

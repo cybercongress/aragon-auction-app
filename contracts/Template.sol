@@ -21,6 +21,7 @@ import "@aragon/apps-token-manager/contracts/TokenManager.sol";
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
 
 import "./Auction.sol";
+// import "./misc/AuctionUtils.sol";
 
 
 contract TemplateBase is APMNamehash {
@@ -79,18 +80,23 @@ contract Template is TemplateBase, TimeHelpers {
         token.changeController(tokenManager);
 
         // Initialize apps
-        app.initialize(uint256(4), getTimestamp() + uint256(100), getTimestamp() + uint256(1100), token, tokenManager);
+        app.initialize(uint256(10), getTimestamp() + uint256(100), getTimestamp() + uint256(1100), token, tokenManager);
         tokenManager.initialize(token, true, 0);
         voting.initialize(token, 50 * PCT, 20 * PCT, 1 minutes);
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
-        acl.createPermission(this, app, app.CREATOR_ROLE(), this);
+
 
         tokenManager.mint(root, 1000); // Give 1000 token to root
-        tokenManager.mint(address(app), 100); // Give 100 token to auction
+        tokenManager.mint(address(app), 190); // Give 190 token to auction
 
-        // Activate auction
-        app.load(uint256(20)); // #0 day - 20, #1/2/3/4 - 20
+        // Activate auction, dev env mode
+        // AuctionUtils utils = new AuctionUtils(app);
+        acl.createPermission(this, app, app.CREATOR_ROLE(), this);
+        acl.createPermission(root, app, app.CREATOR_ROLE(), root);
+        // app.load(100); // #0 day - 100, #1-10 - 10
+        // app.addUtils(utils);
+        acl.revokePermission(this, app, app.CREATOR_ROLE());
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
@@ -105,7 +111,6 @@ contract Template is TemplateBase, TimeHelpers {
         acl.revokePermission(this, acl, acl.CREATE_PERMISSIONS_ROLE());
         acl.setPermissionManager(root, acl, acl.CREATE_PERMISSIONS_ROLE());
 
-        acl.revokePermission(this, app, app.CREATOR_ROLE());
 
         emit DeployInstance(dao);
     }

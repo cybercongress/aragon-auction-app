@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 
 import "@aragon/os/contracts/apps/AragonApp.sol";
@@ -14,6 +14,7 @@ contract Auction is AragonApp, DSMath {
     event LogCollect (uint256 amount);
     // event LogFreeze ();
     event LogPrice (uint256 amount);
+    event LogLoaded();
 
     /// State
     MiniMeToken public token;
@@ -26,6 +27,7 @@ contract Auction is AragonApp, DSMath {
     uint256 public createPerDay;
 
     address public foundation;
+    address public utils;
 
     mapping (uint256 => uint256) public dailyTotals;
     mapping (uint256 => mapping (address => uint256)) public userBuys;
@@ -39,6 +41,7 @@ contract Auction is AragonApp, DSMath {
     string private constant ERROR_NOT_ENOUGH_BALANCE = "NOT_ENOUGH_BALANCE";
     string private constant ERROR_NOT_LOADED = "NOT_LOADED";
     string private constant ERROR_ZERO_FIRST_DAY = "ZERO_FIRST_DAY";
+    string private constant ERROR_LOADED = "LOADED";
 
     /// Modifiers
     modifier loaded {
@@ -70,14 +73,24 @@ contract Auction is AragonApp, DSMath {
     }
 
     function load(uint256 _createFirstDay) public auth(CREATOR_ROLE) {
-        require(_createFirstDay > 0, ERROR_ZERO_FIRST_DAY);
+        // require(createFirstDay == 0, ERROR_LOADED);
+        // require(_createFirstDay > 0, ERROR_ZERO_FIRST_DAY);
 
         uint256 selfBalance = token.balanceOf(address(this));
-        require(selfBalance > 0, ERROR_ZERO_BALANCE);
-        require(selfBalance > _createFirstDay, ERROR_NOT_ENOUGH_BALANCE);
+        // require(selfBalance > 0, ERROR_ZERO_BALANCE);
+        // require(selfBalance > _createFirstDay, ERROR_NOT_ENOUGH_BALANCE);
 
         createFirstDay = _createFirstDay;
-        createPerDay = sub(selfBalance, _createFirstDay) / numberOfDays;
+        createPerDay = sub(selfBalance, createFirstDay) / numberOfDays;
+
+        // assert(createFirstDay > 0);
+        // assert(createPerDay > 0);
+
+        emit LogLoaded();
+    }
+
+    function addUtils(address _utils) public auth(CREATOR_ROLE) {
+        utils = _utils;
     }
 
     function time() public view returns (uint256) {

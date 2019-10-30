@@ -20,16 +20,35 @@ app.store(async (state, { event }) => {
   }
 
   switch (event) {  
+    // case events.ACCOUNTS_TRIGGER:
+    //   return updateConnectedAccount(nextState, returnValues)
     case events.SYNC_STATUS_SYNCING:
       nextState = { ...nextState, isSyncing: true }
       break
     case events.SYNC_STATUS_SYNCED:
       nextState = { ...nextState, isSyncing: false }
       break
+    case 'LogLoaded':
+      console.log("LogLoaded", await getCreateFirstDay(), await getCreatePerDay());
+      nextState = { 
+        ...nextState, 
+        createFirstDay: await getCreateFirstDay(),
+        createPerDay: await getCreatePerDay() 
+      }
+      break
+    // default:
+    //   return state
   }
 
   return nextState
 })
+
+async function updateConnectedAccount(state, { account }) {
+  return {
+    ...state,
+    account,
+  }
+}
 
 async function getOpenTime() {
   return parseInt(await app.call('openTime').toPromise(), 10)
