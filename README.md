@@ -1,8 +1,8 @@
 # Auction Aragon Dapp for Cyber Foundation
 
 ## Status
-1. Contract - alpha, general flow works, debugging
-2. Front - prototyping mocks
+1. Contract - general flow works, debugging
+2. Front - drafted mocks prepared, implementing
 
 
 ## Description of flow
@@ -26,7 +26,7 @@ npm run watch:script
 
 In project root
 ```
-npm run start:ipfs:template
+npm run start:http:template
 ```
 
 ## Deploy to DAO
@@ -52,3 +52,4 @@ truffle-flattener contracts/Auction.sol > AuctionFull.sol
 ```
 
 ## Proposed Front
+[figma](https://www.figma.com/file/MwspxPfwqhwDN6IIyynFQZ/Auction-app?node-id=1%3A2280)

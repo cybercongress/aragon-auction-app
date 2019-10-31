@@ -21,7 +21,7 @@ import "@aragon/apps-token-manager/contracts/TokenManager.sol";
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
 
 import "./Auction.sol";
-// import "./misc/AuctionUtils.sol";
+import "./misc/AuctionUtils.sol";
 
 
 contract TemplateBase is APMNamehash {
@@ -88,15 +88,13 @@ contract Template is TemplateBase, TimeHelpers {
 
 
         tokenManager.mint(root, 1000); // Give 1000 token to root
-        tokenManager.mint(address(app), 190); // Give 190 token to auction
+        tokenManager.mint(address(app), 200); // Give 190 token to auction
 
         // Activate auction, dev env mode
-        // AuctionUtils utils = new AuctionUtils(app);
+        AuctionUtils utils = new AuctionUtils(app);
         acl.createPermission(this, app, app.CREATOR_ROLE(), this);
-        acl.createPermission(root, app, app.CREATOR_ROLE(), root);
-        // app.load(100); // #0 day - 100, #1-10 - 10
-        // app.addUtils(utils);
-        acl.revokePermission(this, app, app.CREATOR_ROLE());
+        app.load(100); // #0 day - 100, #1-10 - 10
+        app.addUtils(utils);
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
@@ -111,6 +109,7 @@ contract Template is TemplateBase, TimeHelpers {
         acl.revokePermission(this, acl, acl.CREATE_PERMISSIONS_ROLE());
         acl.setPermissionManager(root, acl, acl.CREATE_PERMISSIONS_ROLE());
 
+        acl.revokePermission(this, app, app.CREATOR_ROLE());
 
         emit DeployInstance(dao);
     }
