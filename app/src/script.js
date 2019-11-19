@@ -1,35 +1,43 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import Aragon, { events } from '@aragon/api';
-import { addressesEqual, convertDate } from './lib/web3-utils';
+import { convertDate } from './lib/web3-utils';
 
 const app = new Aragon();
 
 app.store(async (state, { event, returnValues, blockNumber, address }) => {
+  let nextState = { ...state };
+
   // Initial state
   if (state == null) {
-    return {
+    nextState = {
       openTime: 0,
       startTime: 0,
       numberOfRounds: 0,
       createFirstRound: 0,
       createPerRound: 0,
       foundation: '',
+      raised: 0,
+      currentPrice: 0,
     };
   }
 
   switch (event) {
     case events.ACCOUNTS_TRIGGER:
-      return updateConnectedAccount(state, returnValues);
+      return updateConnectedAccount(nextState, returnValues);
     case events.SYNC_STATUS_SYNCING:
-      return { ...state, isSyncing: true };
+      nextState = { ...nextState, isSyncing: true };
+      break;
     case events.SYNC_STATUS_SYNCED:
-      return { ...state, isSyncing: false };
+      nextState = { ...nextState, isSyncing: false };
+      break;
     case 'LogLoaded':
-      return handleLogLoaded(state);
+      return handleLogLoaded(nextState);
     default:
       return state;
   }
+
+  return nextState;
 });
 
 async function updateConnectedAccount(state, { account }) {
@@ -65,6 +73,7 @@ async function handleLogLoaded(state) {
     foundation,
     createFirstRound,
     createPerRound,
+    raised,
   ] = await Promise.all([
     getOpenTime(),
     getStartTime(),
@@ -72,6 +81,7 @@ async function handleLogLoaded(state) {
     getFoundation(),
     getCreateFirstRound(),
     getCreatePerRound(),
+    getRaisedAmount(),
   ]);
 
   return {
@@ -82,6 +92,8 @@ async function handleLogLoaded(state) {
     foundation,
     createFirstRound,
     createPerRound,
+    raised,
+    currentPrice: 0,
   };
 }
 
@@ -103,6 +115,12 @@ async function getCreateFirstRound() {
 
 async function getCreatePerRound() {
   return parseInt(await app.call('createPerDay').toPromise(), 10);
+}
+
+async function getRaisedAmount() {
+  const { appAddress } = await app.currentApp().toPromise();
+
+  return parseInt(await app.web3Eth('getBalance', appAddress).toPromise(), 10);
 }
 
 async function getFoundation() {

@@ -13,6 +13,8 @@ const reducer = state => {
       createPerRound: 0,
       foundation: '',
       isSyncing: true,
+      raised: 0,
+      currentPrice: 0,
     };
   }
 
