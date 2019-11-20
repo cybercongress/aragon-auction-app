@@ -34,7 +34,12 @@ function ClaimTable(props) {
     raised,
     currentPrice,
   } = appState;
-  const currentRound = useAuctionRound(startTime, openTime, ROUND_DURATION);
+  const currentRound = useAuctionRound(
+    startTime,
+    openTime,
+    numberOfRounds,
+    ROUND_DURATION
+  );
   const timeLeft = useTimer(getRoundEndTime(currentRound, startTime));
   const cap = getCap(currentPrice);
 

@@ -1,7 +1,6 @@
 import dynamicValue from './dynamic-value';
 
-// TODO: No more than numberOfDays
-const getRound = (startTime, openTime, roundDuration) => {
+const getRound = (startTime, openTime, numberOfRounds, roundDuration) => {
   const now = Date.now();
 
   if (!startTime) {
@@ -16,18 +15,22 @@ const getRound = (startTime, openTime, roundDuration) => {
     return null;
   }
 
-  return Math.floor((now - startTime) / roundDuration) + 1;
+  return Math.min(
+    numberOfRounds,
+    Math.floor((now - startTime) / roundDuration) + 1
+  );
 };
 
 export default function(
   startTime,
   openTime,
+  numberOfRounds,
   roundDuration,
   refreshInterval = 1000
 ) {
   return dynamicValue({
     refreshInterval,
-    params: [startTime, openTime, roundDuration],
+    params: [startTime, openTime, numberOfRounds, roundDuration],
     updateChecker: getRound,
   });
 }
