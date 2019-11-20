@@ -4,6 +4,7 @@ import { useAragonApi } from '@aragon/api-react';
 import { Main, Text } from '@aragon/ui';
 
 import AuctionInformation from './containers/AuctionInformation';
+import ControlPanel from './containers/ControlPanel';
 
 function App() {
   const { appState } = useAragonApi();
@@ -14,6 +15,7 @@ function App() {
       <AppContainer>
         <Header>
           <Text size="xlarge">cyber~Auction</Text>
+          <ControlPanel />
         </Header>
         {isSyncing && <Syncing />}
         <AuctionInformation />

@@ -2,6 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { Table, TableRow, TableCell, Text, theme } from '@aragon/ui';
 import Timer from '../Timer';
+import { isEmpty } from '../../common/helper';
+
+const PLACEHOLDER = '-';
 
 function AuctionDetails({
   currentRound,
@@ -26,7 +29,9 @@ function AuctionDetails({
             <Text color={theme.textSecondary}>Round</Text>
             <br />
             <Text size="xxlarge">
-              {currentRound} of {numberOfRounds}
+              {isEmpty(currentRound) || isEmpty(numberOfRounds)
+                ? PLACEHOLDER
+                : `${currentRound} of ${numberOfRounds}`}
             </Text>
           </div>
         </TableCell>
@@ -34,14 +39,16 @@ function AuctionDetails({
           <div>
             <Text color={theme.textSecondary}>Raised, ETH</Text>
             <br />
-            <Text size="xxlarge">{raised}</Text>
+            <Text size="xxlarge">{isEmpty(raised) ? PLACEHOLDER : raised}</Text>
           </div>
         </TableCell>
         <TableCell>
           <div>
             <Text color={theme.textSecondary}>Current Price, ETH/GGOL</Text>
             <br />
-            <Text size="xxlarge">{currentPrice}</Text>
+            <Text size="xxlarge">
+              {isEmpty(currentPrice) ? PLACEHOLDER : currentPrice}
+            </Text>
           </div>
         </TableCell>
         <TableCell>
@@ -55,7 +62,7 @@ function AuctionDetails({
           <div>
             <Text color={theme.textSecondary}>GOL CAP, ETH</Text>
             <br />
-            <Text size="xxlarge">{cap}</Text>
+            <Text size="xxlarge">{isEmpty(cap) ? PLACEHOLDER : cap}</Text>
           </div>
         </TableCell>
       </TableRow>

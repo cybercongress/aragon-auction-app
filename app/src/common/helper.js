@@ -53,4 +53,4 @@ export function convertDate(date) {
   return new Date(parseInt(date, 10) * MILLISECONDS_IN_SECOND);
 }
 
-export { isAddress, toChecksumAddress, toUtf8, soliditySha3 } from 'web3-utils';
+export const isEmpty = value => value === null || value === undefined;

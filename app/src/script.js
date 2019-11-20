@@ -1,7 +1,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import Aragon, { events } from '@aragon/api';
-import { convertDate } from './lib/web3-utils';
+import { convertDate } from './common/helper';
 
 const app = new Aragon();
 

@@ -4,8 +4,7 @@ import { useAragonApi } from '@aragon/api-react';
 import AuctionDetails from '../../components/AuctionDetails';
 import useAuctionRound from '../../hooks/auction-round';
 import useTimer from '../../hooks/timer';
-
-const ROUND_DURATION = 1000 * 60 * 60; // TODO: Replace with one day in production
+import { ROUND_DURATION } from '../../common/constants';
 
 const getRoundEndTime = (currentRound, startTime) => {
   if (currentRound === null) {
