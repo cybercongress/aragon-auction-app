@@ -32,6 +32,9 @@ function ControlPanel(props) {
       <ActionButton mode="strong" onClick={() => setBuySidePanelOpened(true)}>
         Buy
       </ActionButton>
+      <ActionButton mode="strong" onClick={() => api.collect().toPromise()}>
+        Collect
+      </ActionButton>
       <ClaimSidePanel
         maxValue={numberOfRounds}
         opened={claimSidePanelOpened}
@@ -42,6 +45,7 @@ function ControlPanel(props) {
         }}
       />
       <BuySidePanel
+        minWindow={currentRound}
         maxWindow={numberOfRounds}
         opened={buySidePanelOpened}
         initialWindow={currentRound}
@@ -49,7 +53,7 @@ function ControlPanel(props) {
         onSubmit={(round, amount) => {
           setBuySidePanelOpened(false);
           api
-            .buyWithLimit(round, BUY_LIMIT, { value: toWei(amount) })
+            .buyWithLimit(round, BUY_LIMIT, { value: toWei(amount, 'ether') })
             .toPromise();
         }}
       />

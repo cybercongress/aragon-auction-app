@@ -1,6 +1,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import Aragon, { events } from '@aragon/api';
+import { toBN } from 'web3-utils';
 import { convertDate } from './common/helper';
 
 const app = new Aragon();
@@ -16,9 +17,9 @@ app.store(async (state, { event, returnValues, blockNumber, address }) => {
       numberOfRounds: 0,
       createFirstRound: 0,
       createPerRound: 0,
-      foundation: '',
-      raised: 0,
-      currentPrice: 0,
+      totalRaised: '0',
+      totalRaisedByRound: {},
+      rounds: {},
     };
   }
 
@@ -33,6 +34,8 @@ app.store(async (state, { event, returnValues, blockNumber, address }) => {
       break;
     case 'LogLoaded':
       return handleLogLoaded(nextState);
+    case 'LogBuy':
+      return handleLogBuy(nextState, returnValues);
     default:
       return state;
   }
@@ -47,21 +50,35 @@ async function updateConnectedAccount(state, { account }) {
   };
 }
 
-async function initState() {
-  const [openTime, startTime, numberOfRounds, foundation] = await Promise.all([
-    getOpenTime(),
-    getStartTime(),
-    getNumberOfRounds(),
-    getFoundation(),
-  ]);
+async function handleLogBuy(state, { window, user, amount }) {
+  const { rounds = {}, totalRaisedByRound = {}, totalRaised = '0' } = state;
+  const round = rounds[window] || {};
+  const raisedInRound = totalRaisedByRound[window] || '0';
+  const amountBN = toBN(amount);
+  const userBuys = round[user]
+    ? toBN(round[user])
+        .add(amountBN)
+        .toString(10)
+    : amount;
 
   return {
-    openTime,
-    startTime,
-    numberOfRounds,
-    foundation,
-    createFirstRound: 0,
-    createPerRound: 0,
+    ...state,
+    rounds: {
+      ...rounds,
+      [window]: {
+        ...round,
+        [user]: userBuys,
+      },
+    },
+    totalRaisedByRound: {
+      ...totalRaisedByRound,
+      [window]: toBN(raisedInRound)
+        .add(amountBN)
+        .toString(10),
+    },
+    totalRaised: toBN(totalRaised)
+      .add(amountBN)
+      .toString(10),
   };
 }
 
@@ -70,18 +87,14 @@ async function handleLogLoaded(state) {
     openTime,
     startTime,
     numberOfRounds,
-    foundation,
     createFirstRound,
     createPerRound,
-    raised,
   ] = await Promise.all([
     getOpenTime(),
     getStartTime(),
     getNumberOfRounds(),
-    getFoundation(),
     getCreateFirstRound(),
     getCreatePerRound(),
-    getRaisedAmount(),
   ]);
 
   return {
@@ -89,11 +102,11 @@ async function handleLogLoaded(state) {
     openTime,
     startTime,
     numberOfRounds,
-    foundation,
     createFirstRound,
     createPerRound,
-    raised,
-    currentPrice: 0,
+    totalRaised: '0',
+    totalRaisedByRound: {},
+    rounds: {},
   };
 }
 
@@ -115,14 +128,4 @@ async function getCreateFirstRound() {
 
 async function getCreatePerRound() {
   return parseInt(await app.call('createPerDay').toPromise(), 10);
-}
-
-async function getRaisedAmount() {
-  const { appAddress } = await app.currentApp().toPromise();
-
-  return parseInt(await app.web3Eth('getBalance', appAddress).toPromise(), 10);
-}
-
-async function getFoundation() {
-  return app.call('foundation').toPromise();
 }

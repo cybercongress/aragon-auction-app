@@ -11,10 +11,10 @@ const reducer = state => {
       numberOfRounds: 0,
       createFirstRound: 0,
       createPerRound: 0,
-      foundation: '',
       isSyncing: true,
-      raised: 0,
-      currentPrice: 0,
+      totalRaised: '0',
+      totalRaisedByRound: {},
+      rounds: {},
     };
   }
 

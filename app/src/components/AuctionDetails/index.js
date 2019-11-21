@@ -2,14 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { Table, TableRow, TableCell, Text, theme } from '@aragon/ui';
 import Timer from '../Timer';
-import { isEmpty } from '../../common/helper';
+import { isEmpty, formatCurrency } from '../../common/helper';
 
 const PLACEHOLDER = '-';
 
 function AuctionDetails({
   currentRound,
   numberOfRounds,
-  raised,
+  totalRaised,
   currentPrice,
   timeLeft,
   cap,
@@ -39,7 +39,9 @@ function AuctionDetails({
           <div>
             <Text color={theme.textSecondary}>Raised, ETH</Text>
             <br />
-            <Text size="xxlarge">{isEmpty(raised) ? PLACEHOLDER : raised}</Text>
+            <Text size="xxlarge">
+              {isEmpty(totalRaised) ? PLACEHOLDER : formatCurrency(totalRaised, 4)}
+            </Text>
           </div>
         </TableCell>
         <TableCell>
@@ -47,7 +49,7 @@ function AuctionDetails({
             <Text color={theme.textSecondary}>Current Price, ETH/GGOL</Text>
             <br />
             <Text size="xxlarge">
-              {isEmpty(currentPrice) ? PLACEHOLDER : currentPrice}
+              {isEmpty(currentPrice) ? PLACEHOLDER : formatCurrency(currentPrice, 5)}
             </Text>
           </div>
         </TableCell>
@@ -62,7 +64,7 @@ function AuctionDetails({
           <div>
             <Text color={theme.textSecondary}>GOL CAP, ETH</Text>
             <br />
-            <Text size="xxlarge">{isEmpty(cap) ? PLACEHOLDER : cap}</Text>
+            <Text size="xxlarge">{isEmpty(cap) ? PLACEHOLDER : formatCurrency(cap, 1)}</Text>
           </div>
         </TableCell>
       </TableRow>

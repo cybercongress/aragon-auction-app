@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAragonApi } from '@aragon/api-react';
+import { toBN } from 'web3-utils';
 
 import AuctionDetails from '../../components/AuctionDetails';
 import useAuctionRound from '../../hooks/auction-round';
@@ -19,10 +20,33 @@ const getRoundEndTime = (currentRound, startTime) => {
 };
 
 const getCap = currentPrice => {
+  if (!currentPrice) {
+    return null;
+  }
+
   const thc = 700 * Math.pow(10, 3);
 
-  return thc * currentPrice;
+  return toBN(thc)
+    .mul(toBN(currentPrice))
+    .toString(10);
 };
+
+function getCurrentPrice(
+  currentRound,
+  createFirstRound = 0,
+  createPerRound = 0,
+  raisedInRound = 0
+) {
+  if (!currentRound) {
+    return null;
+  }
+
+  const total = currentRound === 0 ? createFirstRound : createPerRound;
+
+  return toBN(raisedInRound)
+    .div(toBN(total))
+    .toString(10);
+}
 
 function ClaimTable(props) {
   const { appState } = useAragonApi();
@@ -30,8 +54,10 @@ function ClaimTable(props) {
     numberOfRounds,
     startTime,
     openTime,
-    raised,
-    currentPrice,
+    totalRaised,
+    createFirstRound,
+    createPerRound,
+    totalRaisedByRound,
   } = appState;
   const currentRound = useAuctionRound(
     startTime,
@@ -40,13 +66,19 @@ function ClaimTable(props) {
     ROUND_DURATION
   );
   const timeLeft = useTimer(getRoundEndTime(currentRound, startTime));
+  const currentPrice = getCurrentPrice(
+    currentRound,
+    createFirstRound,
+    createPerRound,
+    totalRaisedByRound[currentRound]
+  );
   const cap = getCap(currentPrice);
 
   return (
     <AuctionDetails
       numberOfRounds={numberOfRounds}
       currentRound={currentRound}
-      raised={raised}
+      totalRaised={totalRaised}
       currentPrice={currentPrice}
       timeLeft={timeLeft}
       cap={cap}

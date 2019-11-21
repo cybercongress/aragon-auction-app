@@ -2,25 +2,29 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { SidePanel, Button, TextInput, Text, theme } from '@aragon/ui';
 
+import { safeToString } from '../../common/helper';
+
 function BuySidePanel({
   opened,
   onClose,
   onSubmit,
+  minWindow = '0',
   maxWindow,
   initialWindow = '',
   maxAmount,
   initialAmount = '',
+  minAmount = '0',
 }) {
-  const [window, setWindow] = useState(initialWindow);
-  const [amount, setAmount] = useState(initialAmount);
+  const [window, setWindow] = useState(safeToString(initialWindow));
+  const [amount, setAmount] = useState(safeToString(initialAmount));
   const isValidWindow =
-    window && window > 0 && (!maxWindow || window <= maxWindow);
+    window && window >= minWindow && (!maxWindow || window <= maxWindow);
   const isValidAmount =
-    amount && amount > 0 && (!maxAmount || amount <= maxAmount);
+    amount && amount > minAmount && (!maxAmount || amount <= maxAmount);
   const isValid = isValidWindow && isValidAmount;
 
-  useEffect(() => setWindow(initialWindow), [initialWindow]);
-  useEffect(() => setAmount(initialAmount), [initialAmount]);
+  useEffect(() => setWindow(safeToString(initialWindow)), [initialWindow]);
+  useEffect(() => setAmount(safeToString(initialAmount)), [initialAmount]);
 
   return (
     <SidePanel title="Buy" opened={opened} onClose={onClose}>
@@ -29,7 +33,7 @@ function BuySidePanel({
       </WindowTitle>
       <WindowInput
         type="number"
-        min="0"
+        min={minWindow}
         max={maxWindow}
         value={window}
         onChange={e => setWindow(e.target.value)}
@@ -39,7 +43,8 @@ function BuySidePanel({
       </AmountTitle>
       <AmountInput
         type="number"
-        min="0"
+        min={minAmount}
+        max={maxAmount}
         value={amount}
         onChange={e => setAmount(e.target.value)}
       />

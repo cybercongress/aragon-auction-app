@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { SidePanel, Button, TextInput, Text, theme } from '@aragon/ui';
 
+import { safeToString } from '../../common/helper';
+
 function ClaimSidePanel({
   opened,
   onClose,
@@ -9,10 +11,10 @@ function ClaimSidePanel({
   maxValue,
   initialValue = '',
 }) {
-  const [window, setWindow] = useState(initialValue);
-  const isValid = window && window > 0 && (!maxValue || window <= maxValue);
+  const [window, setWindow] = useState(safeToString(initialValue));
+  const isValid = window && window >= 0 && (!maxValue || window <= maxValue);
 
-  useEffect(() => setWindow(initialValue), [initialValue]);
+  useEffect(() => setWindow(safeToString(initialValue)), [initialValue]);
 
   return (
     <SidePanel title="Claim" opened={opened} onClose={onClose}>
