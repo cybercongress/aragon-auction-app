@@ -6,20 +6,13 @@ import { toWei } from 'web3-utils';
 
 import ClaimSidePanel from '../../components/ClaimSidePanel';
 import BuySidePanel from '../../components/BuySidePanel';
-import useAuctionRound from '../../hooks/auction-round';
-import { ROUND_DURATION, BUY_LIMIT } from '../../common/constants';
+import { BUY_LIMIT } from '../../common/constants';
 
-function ControlPanel(props) {
+function ControlPanel({ currentRound, ...props }) {
   const [claimSidePanelOpened, setClaimSidePanelOpened] = useState(false);
   const [buySidePanelOpened, setBuySidePanelOpened] = useState(false);
   const { api, appState } = useAragonApi();
-  const { numberOfRounds, startTime, openTime } = appState;
-  const currentRound = useAuctionRound(
-    startTime,
-    openTime,
-    numberOfRounds,
-    ROUND_DURATION
-  );
+  const { numberOfRounds } = appState;
 
   return (
     <div {...props}>
@@ -63,7 +56,7 @@ function ControlPanel(props) {
 
 const ActionButton = styled(Button)`
   font-size: 16px;
-  margin: 0 10px;
+  margin: 10px;
   width: 185px;
 `;
 

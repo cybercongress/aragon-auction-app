@@ -1,4 +1,7 @@
 import dynamicValue from './dynamic-value';
+import { useAragonApi } from '@aragon/api-react';
+
+import { ROUND_DURATION } from '../common/constants';
 
 const getRound = (startTime, openTime, numberOfRounds, roundDuration) => {
   const now = Date.now();
@@ -22,12 +25,12 @@ const getRound = (startTime, openTime, numberOfRounds, roundDuration) => {
 };
 
 export default function(
-  startTime,
-  openTime,
-  numberOfRounds,
-  roundDuration,
+  roundDuration = ROUND_DURATION,
   refreshInterval = 1000
 ) {
+  const { appState } = useAragonApi();
+  const { numberOfRounds, startTime, openTime } = appState;
+
   return dynamicValue({
     refreshInterval,
     params: [startTime, openTime, numberOfRounds, roundDuration],

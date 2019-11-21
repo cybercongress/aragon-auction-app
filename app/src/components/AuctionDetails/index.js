@@ -40,7 +40,9 @@ function AuctionDetails({
             <Text color={theme.textSecondary}>Raised, ETH</Text>
             <br />
             <Text size="xxlarge">
-              {isEmpty(totalRaised) ? PLACEHOLDER : formatCurrency(totalRaised, 4)}
+              {isEmpty(totalRaised)
+                ? PLACEHOLDER
+                : formatCurrency(totalRaised, 4)}
             </Text>
           </div>
         </TableCell>
@@ -49,7 +51,9 @@ function AuctionDetails({
             <Text color={theme.textSecondary}>Current Price, ETH/GGOL</Text>
             <br />
             <Text size="xxlarge">
-              {isEmpty(currentPrice) ? PLACEHOLDER : formatCurrency(currentPrice, 5)}
+              {isEmpty(currentPrice)
+                ? PLACEHOLDER
+                : formatCurrency(currentPrice, 5)}
             </Text>
           </div>
         </TableCell>
@@ -64,7 +68,9 @@ function AuctionDetails({
           <div>
             <Text color={theme.textSecondary}>GOL CAP, ETH</Text>
             <br />
-            <Text size="xxlarge">{isEmpty(cap) ? PLACEHOLDER : formatCurrency(cap, 1)}</Text>
+            <Text size="xxlarge">
+              {isEmpty(cap) ? PLACEHOLDER : formatCurrency(cap, 1)}
+            </Text>
           </div>
         </TableCell>
       </TableRow>

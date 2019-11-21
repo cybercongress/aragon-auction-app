@@ -4,21 +4,25 @@ import { useAragonApi } from '@aragon/api-react';
 import { Main, Text } from '@aragon/ui';
 
 import AuctionInformation from './containers/AuctionInformation';
+import AuctionRounds from './containers/AuctionRounds';
 import ControlPanel from './containers/ControlPanel';
+import useAuctionRoundNumber from './hooks/auction-round-number';
 
 function App() {
   const { appState } = useAragonApi();
   const { isSyncing } = appState;
+  const currentRound = useAuctionRoundNumber();
 
   return (
     <Main>
       <AppContainer>
         <Header>
           <Text size="xlarge">cyber~Auction</Text>
-          <ControlPanel />
+          <ControlPanel currentRound={currentRound} />
         </Header>
         {isSyncing && <Syncing />}
-        <AuctionInformation />
+        <AuctionInformation currentRound={currentRound} />
+        <AuctionRoundsTable currentRound={currentRound} />
       </AppContainer>
     </Main>
   );
@@ -39,6 +43,11 @@ const Header = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 30px 0;
+  align-items: center;
+`;
+
+const AuctionRoundsTable = styled(AuctionRounds)`
+  margin-top: 40px;
 `;
 
 export default App;
