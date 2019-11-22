@@ -22,9 +22,14 @@ function getUserReward(price, userBuys) {
     return null;
   }
 
-  return toBN(userBuys)
-    .div(toBN(price))
-    .toString(10);
+  const precision = 10000;
+
+  return (
+    toBN(userBuys)
+      .mul(toBN(precision.toString()))
+      .div(toBN(price))
+      .toNumber() / precision
+  );
 }
 
 function AuctionRounds({ style = {}, currentRound, ...props }) {
