@@ -14,11 +14,11 @@ function createRoundsByLength(length) {
 
 function getUserBuys(currentRound, address, rounds) {
   const round = rounds[currentRound] || {};
-  return round[address] || '0';
+  return round[address];
 }
 
 function getUserReward(price, userBuys) {
-  if (price === null || userBuys === null) {
+  if (!price || !userBuys || price === '0' || userBuys === '0') {
     return null;
   }
 
@@ -66,14 +66,15 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
               raised
             );
             const userBuys = getUserBuys(round, account, rounds);
+            const reward = getUserReward(currentPrice, userBuys);
 
             return [
               round,
               round === 0 ? createFirstRound : createPerRound,
               raised || '0',
               currentPrice || '0',
-              userBuys,
-              getUserReward(currentPrice, userBuys),
+              userBuys || '0',
+              reward || '0',
             ];
           })}
           renderEntry={([
@@ -90,7 +91,7 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
             <Text>{formatCurrency(currentPrice, 5)}</Text>,
             <AuctionClosing currentRound={currentRound} round={round} />,
             <Text>{formatCurrency(userBuys, 4)}</Text>,
-            <Text>{formatCurrency(reward, 5)}</Text>,
+            <Text>{reward}</Text>,
           ]}
           mode="table"
           entriesPerPage={AUCTION_ROUNDS_PER_PAGE}

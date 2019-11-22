@@ -10,7 +10,10 @@ export function roundCurrency(value, decimalDigits = 0) {
 }
 
 export function formatCurrency(value, decimalDigits = 0) {
-  return roundCurrency(parseFloat(fromWei(value, 'ether')), decimalDigits);
+  return roundCurrency(
+    parseFloat(fromWei(value.toString(), 'ether')),
+    decimalDigits
+  );
 }
 
 export function convertDate(date) {

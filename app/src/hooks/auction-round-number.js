@@ -15,7 +15,7 @@ const getRound = (startTime, openTime, numberOfRounds, roundDuration) => {
   }
 
   if (now < startTime) {
-    return null;
+    return undefined;
   }
 
   return Math.min(
