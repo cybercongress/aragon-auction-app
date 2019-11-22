@@ -23,7 +23,7 @@ function getUserReward(price, userBuys) {
   }
 
   return toBN(userBuys)
-    .mul(toBN(price))
+    .div(toBN(price))
     .toString(10);
 }
 
@@ -90,7 +90,7 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
             <Text>{formatCurrency(currentPrice, 5)}</Text>,
             <AuctionClosing currentRound={currentRound} round={round} />,
             <Text>{formatCurrency(userBuys, 4)}</Text>,
-            <Text>{formatCurrency(reward)}</Text>,
+            <Text>{formatCurrency(reward, 5)}</Text>,
           ]}
           mode="table"
           entriesPerPage={AUCTION_ROUNDS_PER_PAGE}
