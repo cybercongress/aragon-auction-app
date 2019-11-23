@@ -1,66 +1,53 @@
-import React from 'react'
-import { useAragonApi } from '@aragon/api-react'
-import { Main, Button } from '@aragon/ui'
-import styled from 'styled-components'
+import React from 'react';
+import styled from 'styled-components';
+import { useAragonApi } from '@aragon/api-react';
+import { Main, Text } from '@aragon/ui';
+
+import AuctionInformation from './containers/AuctionInformation';
+import AuctionRounds from './containers/AuctionRounds';
+import ControlPanel from './containers/ControlPanel';
+import useAuctionRoundNumber from './hooks/auction-round-number';
 
 function App() {
-  const { api, appState } = useAragonApi()
-  const { 
-    openTime,
-    startTime,
-    numberOfDays,
-    createFirstDay,
-    createPerDay,
-    foundation,
-    isSyncing 
-  } = appState
-  console.log(isSyncing)
+  const { appState } = useAragonApi();
+  const { isSyncing } = appState;
+  const currentRound = useAuctionRoundNumber();
+
   return (
     <Main>
-      <BaseLayout>
+      <AppContainer>
+        <Header>
+          <Text size="xlarge">cyber~Auction</Text>
+          <ControlPanel currentRound={currentRound} />
+        </Header>
         {isSyncing && <Syncing />}
-        <Count>openTime: {openTime}</Count>
-        <Count>startTime: {startTime}</Count>
-        <Count>numberOfDays: {numberOfDays}</Count>
-        <Count>createFirstDay: {createFirstDay}</Count>
-        <Count>createPerDay: {createPerDay}</Count>
-        <Count>foundation: {foundation}</Count>
-        <Buttons>
-          <Button mode="secondary" onClick={() => api.buy({value: 100000000000000000}).toPromise()}>
-            Buy
-          </Button>
-          <Button mode="secondary" onClick={() => api.load(20).toPromise()}>
-            Load
-          </Button>
-        </Buttons>
-      </BaseLayout>
+        <AuctionInformation currentRound={currentRound} />
+        <AuctionRoundsTable currentRound={currentRound} />
+      </AppContainer>
     </Main>
-  )
+  );
 }
 
-const BaseLayout = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  flex-direction: column;
-`
-
-const Count = styled.h1`
-  font-size: 30px;
-`
-
-const Buttons = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  grid-gap: 40px;
-  margin-top: 20px;
-`
+const AppContainer = styled.div`
+  padding: 0 60px;
+`;
 
 const Syncing = styled.div.attrs({ children: 'Syncing…' })`
   position: absolute;
   top: 15px;
   right: 20px;
-`
+`;
 
-export default App
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 30px 0;
+  align-items: center;
+`;
+
+const AuctionRoundsTable = styled(AuctionRounds)`
+  margin-top: 40px;
+`;
+
+export default App;

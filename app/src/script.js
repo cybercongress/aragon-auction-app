@@ -1,75 +1,131 @@
-import 'core-js/stable'
-import 'regenerator-runtime/runtime'
-import Aragon, { events } from '@aragon/api'
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import Aragon, { events } from '@aragon/api';
+import { toBN } from 'web3-utils';
+import { convertDate } from './common/helper';
 
-const app = new Aragon()
+const app = new Aragon();
 
-app.store(async (state, { event }) => {
-  let nextState = { ...state }
+app.store(async (state, { event, returnValues, blockNumber, address }) => {
+  let nextState = { ...state };
 
   // Initial state
   if (state == null) {
     nextState = {
-      openTime: await getOpenTime(),
-      startTime: await getStartTime(),
-      numberOfDays: await getNumberOfDays(),
-      createFirstDay: await getCreateFirstDay(),
-      createPerDay: await getCreatePerDay(),
-      foundation: await getFoundation(),
-    }
+      openTime: 0,
+      startTime: 0,
+      numberOfRounds: 0,
+      createFirstRound: 0,
+      createPerRound: 0,
+      totalRaised: '0',
+      totalRaisedByRound: {},
+      rounds: {},
+    };
   }
 
-  switch (event) {  
-    // case events.ACCOUNTS_TRIGGER:
-    //   return updateConnectedAccount(nextState, returnValues)
+  switch (event) {
+    case events.ACCOUNTS_TRIGGER:
+      return updateConnectedAccount(nextState, returnValues);
     case events.SYNC_STATUS_SYNCING:
-      nextState = { ...nextState, isSyncing: true }
-      break
+      nextState = { ...nextState, isSyncing: true };
+      break;
     case events.SYNC_STATUS_SYNCED:
-      nextState = { ...nextState, isSyncing: false }
-      break
+      nextState = { ...nextState, isSyncing: false };
+      break;
     case 'LogLoaded':
-      console.log("LogLoaded", await getCreateFirstDay(), await getCreatePerDay());
-      nextState = { 
-        ...nextState, 
-        createFirstDay: await getCreateFirstDay(),
-        createPerDay: await getCreatePerDay() 
-      }
-      break
-    // default:
-    //   return state
+      return handleLogLoaded(nextState);
+    case 'LogBuy':
+      return handleLogBuy(nextState, returnValues);
+    default:
+      return state;
   }
 
-  return nextState
-})
+  return nextState;
+});
 
 async function updateConnectedAccount(state, { account }) {
   return {
     ...state,
     account,
-  }
+  };
+}
+
+async function handleLogBuy(state, { window, user, amount }) {
+  const { rounds = {}, totalRaisedByRound = {}, totalRaised = '0' } = state;
+  const round = rounds[window] || {};
+  const raisedInRound = totalRaisedByRound[window] || '0';
+  const amountBN = toBN(amount);
+  const userBuys = round[user]
+    ? toBN(round[user])
+        .add(amountBN)
+        .toString(10)
+    : amount;
+
+  return {
+    ...state,
+    rounds: {
+      ...rounds,
+      [window]: {
+        ...round,
+        [user]: userBuys,
+      },
+    },
+    totalRaisedByRound: {
+      ...totalRaisedByRound,
+      [window]: toBN(raisedInRound)
+        .add(amountBN)
+        .toString(10),
+    },
+    totalRaised: toBN(totalRaised)
+      .add(amountBN)
+      .toString(10),
+  };
+}
+
+async function handleLogLoaded(state) {
+  const [
+    openTime,
+    startTime,
+    numberOfRounds,
+    createFirstRound,
+    createPerRound,
+  ] = await Promise.all([
+    getOpenTime(),
+    getStartTime(),
+    getNumberOfRounds(),
+    getCreateFirstRound(),
+    getCreatePerRound(),
+  ]);
+
+  return {
+    ...state,
+    openTime,
+    startTime,
+    numberOfRounds,
+    createFirstRound,
+    createPerRound,
+    totalRaised: '0',
+    totalRaisedByRound: {},
+    rounds: {},
+  };
 }
 
 async function getOpenTime() {
-  return parseInt(await app.call('openTime').toPromise(), 10)
+  return convertDate(await app.call('openTime').toPromise());
 }
 
 async function getStartTime() {
-  return parseInt(await app.call('startTime').toPromise(), 10)
+  return convertDate(await app.call('startTime').toPromise());
 }
 
-async function getNumberOfDays() {
-  return parseInt(await app.call('numberOfDays').toPromise(), 10)
+async function getNumberOfRounds() {
+  return parseInt(await app.call('numberOfDays').toPromise(), 10);
 }
 
-async function getCreateFirstDay() {
-  return parseInt(await app.call('createFirstDay').toPromise(), 10)
+async function getCreateFirstRound() {
+  return parseInt(await app.call('createFirstDay').toPromise(), 10);
 }
 
-async function getCreatePerDay() {
-  return parseInt(await app.call('createPerDay').toPromise(), 10)
-}
-
-async function getFoundation() {
-  return await app.call('foundation').toPromise()
+async function getCreatePerRound() {
+  return parseInt(await app.call('createPerDay').toPromise(), 10);
 }
