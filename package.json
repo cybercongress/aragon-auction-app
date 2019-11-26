@@ -1,6 +1,6 @@
 {
   "name": "auction",
-  "version": "1.2.0",
+  "version": "3.0.0",
   "description": "",
   "dependencies": {
     "@aragon/os": "^4.2.1",
