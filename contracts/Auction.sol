@@ -3,6 +3,7 @@ pragma solidity 0.4.24;
 
 import "@aragon/os/contracts/apps/AragonApp.sol";
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
+import "@aragon/apps-token-manager/contracts/TokenManager.sol";
 import "./misc/DSMath.sol";
 
 
@@ -15,9 +16,11 @@ contract Auction is AragonApp, DSMath {
     // event LogFreeze ();
     event LogPrice (uint256 amount);
     event LogLoaded();
+    event LogBurn();
 
     /// State
     MiniMeToken public token;
+    TokenManager public tokenManager;
 
     uint256 public openTime;
     uint256 public createFirstDay;
@@ -54,7 +57,8 @@ contract Auction is AragonApp, DSMath {
         uint256 _openTime,
         uint256 _startTime,
         MiniMeToken _token,
-        address _foundation
+        address _foundation,
+        address _tokenManager
     ) public onlyInit
     {
         numberOfDays = _numberOfDays;
@@ -62,6 +66,7 @@ contract Auction is AragonApp, DSMath {
         startTime = _startTime;
         token = _token;
         foundation = _foundation;
+        tokenManager = TokenManager(_tokenManager);
 
         assert(numberOfDays > 0);
         assert(openTime < startTime);
@@ -139,6 +144,7 @@ contract Auction is AragonApp, DSMath {
 
         uint256 price = wdiv(createOnDay(day), dailyTotals[day]);
         uint256 reward = wmul(price, userBuys[day][msg.sender]);
+        reward = sub(reward, 1); // sub 1 token from reward for dust
 
         claimed[day][msg.sender] = true;
         token.transfer(msg.sender, reward);
@@ -160,8 +166,10 @@ contract Auction is AragonApp, DSMath {
         emit LogCollect(address(this).balance);
     }
 
-    // // function freeze() public loaded {
-    // //     assert(today() > numberOfDays + 1);
-    // //     emit LogFreeze();
-    // // }
+    function burnDust() public loaded auth(CREATOR_ROLE) {
+        assert(today() > numberOfDays + 1);
+        uint256 dust = token.balanceOf(address(this));
+        tokenManager.burn(address(this), dust);
+        emit LogBurn();
+    }
 }
