@@ -86,13 +86,13 @@ contract Template is TemplateBase, TimeHelpers {
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
 
-        tokenManager.mint(root, 1000); // Give 1000 token to root
-        tokenManager.mint(address(app), 200); // Give 190 token to auction
+        tokenManager.mint(root, 800000000000000); // Give 1000 token to root
+        tokenManager.mint(address(app), 200000000000000); // Give 190 token to auction
 
         // Activate auction, dev env mode
         AuctionUtils utils = new AuctionUtils(app);
         acl.createPermission(this, app, app.CREATOR_ROLE(), this);
-        app.load(100); // #0 day - 100, #1-10 - 10
+        app.load(100000000000000); // #0 day - 100, #1-10 - 10
         app.addUtils(utils);
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
