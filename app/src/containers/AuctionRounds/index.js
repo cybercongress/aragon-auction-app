@@ -23,12 +23,12 @@ function getUserReward(price, userBuys) {
   }
 
   const precision = 10000;
-
+  const reward = toBN(userBuys)
+    .mul(toBN(precision.toString()))
+    .div(toBN(price))
+    .toNumber() / precision
   return (
-    toBN(userBuys)
-      .mul(toBN(precision.toString()))
-      .div(toBN(price))
-      .toNumber() / precision
+    Math.round(reward)
   );
 }
 
@@ -95,7 +95,7 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
             <Text>{formatCurrency(raised, 4)}</Text>,
             <Text>{formatCurrency(currentPrice, 5)}</Text>,
             <AuctionClosing currentRound={currentRound} round={round} />,
-            <Text>{formatCurrency(userBuys, 4)}</Text>,
+            <Text>{formatCurrency(userBuys, 0)}</Text>,
             <Text>{reward}</Text>,
           ]}
           mode="table"
