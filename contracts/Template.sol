@@ -80,12 +80,11 @@ contract Template is TemplateBase, TimeHelpers {
         token.changeController(tokenManager);
 
         // Initialize apps
-        app.initialize(uint256(10), getTimestamp() + uint256(100), getTimestamp() + uint256(1100), token, tokenManager);
+        app.initialize(uint256(10), getTimestamp() + uint256(100), getTimestamp() + uint256(1100), token, tokenManager, tokenManager);
         tokenManager.initialize(token, true, 0);
         voting.initialize(token, 50 * PCT, 20 * PCT, 1 minutes);
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
-
 
         tokenManager.mint(root, 1000); // Give 1000 token to root
         tokenManager.mint(address(app), 200); // Give 190 token to auction
@@ -99,6 +98,7 @@ contract Template is TemplateBase, TimeHelpers {
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
         acl.grantPermission(voting, tokenManager, tokenManager.MINT_ROLE());
+        acl.createPermission(app, tokenManager, tokenManager.BURN_ROLE(), this);
 
         // Clean up permissions
         acl.grantPermission(root, dao, dao.APP_MANAGER_ROLE());
