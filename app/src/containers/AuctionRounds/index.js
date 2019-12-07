@@ -7,6 +7,7 @@ import { formatCurrency, isEmpty } from '../../common/helper';
 import { AUCTION_ROUNDS_PER_PAGE } from '../../common/constants';
 import { getCurrentPrice } from '../../hooks/auction-round-price';
 import AuctionClosing from '../../components/AuctionClosing';
+import { fromWei } from 'web3-utils';
 
 function createRoundsByLength(length) {
   return Array.from({ length: length + 1 }, (v, k) => k);
@@ -22,13 +23,11 @@ function getUserReward(price, userBuys) {
     return null;
   }
 
-  const precision = 10000;
   const reward = toBN(userBuys)
-    .mul(toBN(precision.toString()))
     .div(toBN(price))
-    .toNumber() / precision
+    .toNumber()
   return (
-    Math.round(reward)
+    Math.round(reward-1)
   );
 }
 
@@ -57,7 +56,7 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
             { label: 'Round', align: 'start' },
             { label: 'Distributed, GGOL', align: 'end' },
             { label: 'Total, ETH', align: 'end' },
-            { label: 'PRICE, ETH/GGOL', align: 'end' },
+            { label: 'PRICE, GGOL/ETH', align: 'end' },
             { label: 'Closing', align: 'end' },
             { label: 'Your ETH', align: 'end' },
             { label: 'Your GGOL', align: 'end' },
@@ -93,9 +92,9 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
             <Text>{round}</Text>,
             <Text>{distributed}</Text>,
             <Text>{formatCurrency(raised, 4)}</Text>,
-            <Text>{formatCurrency(currentPrice, 5)}</Text>,
+            <Text>{fromWei((toBN(currentPrice).mul(toBN("1000000"))).toString(), 'ether')}</Text>,
             <AuctionClosing currentRound={currentRound} round={round} />,
-            <Text>{formatCurrency(userBuys, 0)}</Text>,
+            <Text>{formatCurrency(userBuys, 4)}</Text>,
             <Text>{reward}</Text>,
           ]}
           mode="table"

@@ -48,7 +48,7 @@ function AuctionDetails({
         </TableCell>
         <TableCell>
           <div>
-            <Text color={theme.textSecondary}>Current Price, ETH/GGOL</Text>
+            <Text color={theme.textSecondary}>Current Price, GGOL/ETH</Text>
             <br />
             <Text size="xxlarge">
               {isEmpty(currentPrice)
