@@ -19,7 +19,7 @@ function AuctionDetails({
       <TableRow>
         <TableHeader colSpan="5">
           <Text color={theme.textSecondary} size="xsmall">
-            Auction information
+            Welcome to Test of Thrones (0 round) and Test auction (other rounds). Here you can obtain GOLs. 1 GOL vested untill the end to Test~Auction gives 1 EUL. Remember that GOLs have value only for participation in the Game of Links!
           </Text>
         </TableHeader>
       </TableRow>
