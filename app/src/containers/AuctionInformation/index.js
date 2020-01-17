@@ -1,5 +1,7 @@
 import React from 'react';
 import { useAragonApi } from '@aragon/api-react';
+
+import { fromWei } from 'web3-utils';
 import { toBN } from 'web3-utils';
 
 import AuctionDetails from '../../components/AuctionDetails';
@@ -11,11 +13,10 @@ const getCap = currentPrice => {
     return null;
   }
 
-  const thc = 700 * Math.pow(10, 3);
+  const thc = Math.pow(10, 15);
+  const capWei = toBN(thc).mul(toBN(currentPrice));
+  return fromWei(toBN(capWei).toString(), 'ether');
 
-  return toBN(thc)
-    .mul(toBN(currentPrice))
-    .toString(10);
 };
 
 function AuctionInformation({ currentRound, ...props }) {

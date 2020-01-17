@@ -4,6 +4,9 @@ import { Table, TableRow, TableCell, Text, theme } from '@aragon/ui';
 import Timer from '../Timer';
 import { isEmpty, formatCurrency } from '../../common/helper';
 
+import { fromWei } from 'web3-utils';
+import { toBN } from 'web3-utils';
+
 const PLACEHOLDER = '-';
 
 function AuctionDetails({
@@ -42,18 +45,18 @@ function AuctionDetails({
             <Text size="xxlarge">
               {isEmpty(totalRaised)
                 ? PLACEHOLDER
-                : formatCurrency(totalRaised, 4)}
+                : formatCurrency(totalRaised, 3)}
             </Text>
           </div>
         </TableCell>
         <TableCell>
           <div>
-            <Text color={theme.textSecondary}>Current Price, GGOL/ETH</Text>
+            <Text color={theme.textSecondary}>Current Price, GOL/ETH</Text>
             <br />
             <Text size="xxlarge">
               {isEmpty(currentPrice)
                 ? PLACEHOLDER
-                : formatCurrency(currentPrice, 5)}
+                : fromWei(toBN(currentPrice).toString(), 'ether') }
             </Text>
           </div>
         </TableCell>
@@ -69,7 +72,7 @@ function AuctionDetails({
             <Text color={theme.textSecondary}>GOL CAP, ETH</Text>
             <br />
             <Text size="xxlarge">
-              {isEmpty(cap) ? PLACEHOLDER : formatCurrency(cap, 1)}
+              {isEmpty(cap) ? PLACEHOLDER : cap }
             </Text>
           </div>
         </TableCell>

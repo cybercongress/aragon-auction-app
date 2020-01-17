@@ -17,17 +17,17 @@ function ControlPanel({ currentRound, ...props }) {
   return (
     <div {...props}>
       <ActionButton mode="strong" onClick={() => api.claimAll().toPromise()}>
-        Claim all
-      </ActionButton>
-      <ActionButton mode="strong" onClick={() => setClaimSidePanelOpened(true)}>
         Claim
       </ActionButton>
+      {/* <ActionButton mode="strong" onClick={() => setClaimSidePanelOpened(true)}>
+        Claim
+      </ActionButton> */}
       <ActionButton mode="strong" onClick={() => setBuySidePanelOpened(true)}>
         Buy
       </ActionButton>
-      <ActionButton mode="strong" onClick={() => api.collect().toPromise()}>
+      {/* <ActionButton mode="strong" onClick={() => api.collect().toPromise()}>
         Collect
-      </ActionButton>
+      </ActionButton> */}
       <ClaimSidePanel
         maxValue={numberOfRounds}
         opened={claimSidePanelOpened}

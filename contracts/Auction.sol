@@ -13,7 +13,6 @@ contract Auction is AragonApp, DSMath {
     event LogBuy (uint256 window, address indexed user, uint256 amount);
     event LogClaim (uint256 window, address indexed user, uint256 amount);
     event LogCollect (uint256 amount);
-    // event LogFreeze ();
     event LogPrice (uint256 amount);
     event LogLoaded();
     event LogBurn();
@@ -40,11 +39,7 @@ contract Auction is AragonApp, DSMath {
     bytes32 constant public CREATOR_ROLE = keccak256("CREATOR_ROLE");
 
     // /// ERRORS
-    string private constant ERROR_ZERO_BALANCE = "ZERO_BALANCE";
-    string private constant ERROR_NOT_ENOUGH_BALANCE = "NOT_ENOUGH_BALANCE";
     string private constant ERROR_NOT_LOADED = "NOT_LOADED";
-    string private constant ERROR_ZERO_FIRST_DAY = "ZERO_FIRST_DAY";
-    string private constant ERROR_LOADED = "LOADED";
 
     /// Modifiers
     modifier loaded {
@@ -78,18 +73,13 @@ contract Auction is AragonApp, DSMath {
     }
 
     function load(uint256 _createFirstDay) public auth(CREATOR_ROLE) {
-        // require(createFirstDay == 0, ERROR_LOADED);
-        // require(_createFirstDay > 0, ERROR_ZERO_FIRST_DAY);
-
         uint256 selfBalance = token.balanceOf(address(this));
-        // require(selfBalance > 0, ERROR_ZERO_BALANCE);
-        // require(selfBalance > _createFirstDay, ERROR_NOT_ENOUGH_BALANCE);
 
         createFirstDay = _createFirstDay;
         createPerDay = sub(selfBalance, createFirstDay) / numberOfDays;
 
-        // assert(createFirstDay > 0);
-        // assert(createPerDay > 0);
+        assert(createFirstDay > 0);
+        assert(createPerDay > 0);
 
         emit LogLoaded();
     }
@@ -144,7 +134,7 @@ contract Auction is AragonApp, DSMath {
 
         uint256 price = wdiv(createOnDay(day), dailyTotals[day]);
         uint256 reward = wmul(price, userBuys[day][msg.sender]);
-        reward = sub(reward, 1); // sub 1 token from reward for dust
+        reward = sub(reward, 1);
 
         claimed[day][msg.sender] = true;
         token.transfer(msg.sender, reward);

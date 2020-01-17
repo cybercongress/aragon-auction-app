@@ -11,6 +11,10 @@ export function getCurrentPrice(
     return null;
   }
 
+  if (raisedInRound == '0') {
+    return '0';
+  }
+
   const total = currentRound === 0 ? createFirstRound : createPerRound;
   return toBN(raisedInRound)
     .div(toBN(total))

@@ -76,29 +76,30 @@ contract Template is TemplateBase, TimeHelpers {
         Voting voting = Voting(dao.newAppInstance(votingAppId, latestVersionAppBase(votingAppId)));
         TokenManager tokenManager = TokenManager(dao.newAppInstance(tokenManagerAppId, latestVersionAppBase(tokenManagerAppId)));
 
-        MiniMeToken token = tokenFactory.createCloneToken(MiniMeToken(0), 0, "Euler2 Test Token", 0, "EUL2", true);
+        MiniMeToken token = tokenFactory.createCloneToken(MiniMeToken(0), 0, "Euler", 0, "EUL", true);
         token.changeController(tokenManager);
 
         // Initialize apps
-        app.initialize(uint256(10), getTimestamp() + uint256(100), getTimestamp() + uint256(1100), token, tokenManager, tokenManager);
+        uint256 openTime = getTimestamp() + uint256(100);
+        uint256 startTime = getTimestamp() + uint256(1000);
+        app.initialize(uint256(10), openTime, startTime, token, tokenManager, tokenManager);
         tokenManager.initialize(token, true, 0);
         voting.initialize(token, 50 * PCT, 20 * PCT, 1 minutes);
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
 
-        tokenManager.mint(root, 800000000000000); // Give 1000 token to root
-        tokenManager.mint(address(app), 200000000000000); // Give 190 token to auction
+        tokenManager.mint(root, 800000000000000);
+        tokenManager.mint(address(app), 200000000000000);
 
-        // Activate auction, dev env mode
-        AuctionUtils utils = new AuctionUtils(app);
+        // AuctionUtils utils = new AuctionUtils(app);
         acl.createPermission(this, app, app.CREATOR_ROLE(), this);
-        app.load(100000000000000); // #0 day - 100, #1-10 - 10
-        app.addUtils(utils);
+        // app.addUtils(utils);
+        app.load(100000000000000);
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
         acl.grantPermission(voting, tokenManager, tokenManager.MINT_ROLE());
-        acl.createPermission(app, tokenManager, tokenManager.BURN_ROLE(), this);
+        // acl.createPermission(app, tokenManager, tokenManager.BURN_ROLE(), this);
 
         // Clean up permissions
         acl.grantPermission(root, dao, dao.APP_MANAGER_ROLE());
@@ -109,7 +110,10 @@ contract Template is TemplateBase, TimeHelpers {
         acl.revokePermission(this, acl, acl.CREATE_PERMISSIONS_ROLE());
         acl.setPermissionManager(root, acl, acl.CREATE_PERMISSIONS_ROLE());
 
-        acl.revokePermission(this, app, app.CREATOR_ROLE());
+        acl.grantPermission(root, app, app.CREATOR_ROLE());
+        acl.setPermissionManager(root, app, app.CREATOR_ROLE());
+
+        acl.revokePermission(this, tokenManager, tokenManager.MINT_ROLE());
 
         emit DeployInstance(dao);
     }
