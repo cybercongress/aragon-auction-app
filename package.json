@@ -1,6 +1,6 @@
 {
-  "name": "auction",
-  "version": "1.0.3",
+  "name": "aragon-cyber-auction",
+  "version": "1.0.0",
   "description": "",
   "dependencies": {
     "@aragon/apps-shared-minime": "^1.0.1",

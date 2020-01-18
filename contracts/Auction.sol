@@ -13,7 +13,7 @@ contract Auction is AragonApp, DSMath {
     event LogBuy (uint256 window, address indexed user, uint256 amount);
     event LogClaim (uint256 window, address indexed user, uint256 amount);
     event LogCollect (uint256 amount);
-    event LogPrice (uint256 amount);
+    event LogPrice (uint256 price);
     event LogLoaded();
     event LogBurn();
 
@@ -51,7 +51,7 @@ contract Auction is AragonApp, DSMath {
         uint256 _numberOfDays,
         uint256 _openTime,
         uint256 _startTime,
-        MiniMeToken _token,
+        address _token,
         address _foundation,
         address _tokenManager
     ) public onlyInit
@@ -59,7 +59,7 @@ contract Auction is AragonApp, DSMath {
         numberOfDays = _numberOfDays;
         openTime = _openTime;
         startTime = _startTime;
-        token = _token;
+        token = MiniMeToken(_token);
         foundation = _foundation;
         tokenManager = TokenManager(_tokenManager);
 
@@ -159,7 +159,10 @@ contract Auction is AragonApp, DSMath {
     function burnDust() public loaded auth(CREATOR_ROLE) {
         assert(today() > numberOfDays + 1);
         uint256 dust = token.balanceOf(address(this));
+
+        assert(dust > 0);
         tokenManager.burn(address(this), dust);
+
         emit LogBurn();
     }
 }

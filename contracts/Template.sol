@@ -21,7 +21,6 @@ import "@aragon/apps-token-manager/contracts/TokenManager.sol";
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
 
 import "./Auction.sol";
-import "./misc/AuctionUtils.sol";
 
 
 contract TemplateBase is APMNamehash {
@@ -87,19 +86,19 @@ contract Template is TemplateBase, TimeHelpers {
         voting.initialize(token, 50 * PCT, 20 * PCT, 1 minutes);
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
+        acl.createPermission(this, tokenManager, tokenManager.BURN_ROLE(), this);
 
         tokenManager.mint(root, 800000000000000);
-        tokenManager.mint(address(app), 200000000000000);
+        tokenManager.mint(app, 200000000000000);
 
-        // AuctionUtils utils = new AuctionUtils(app);
         acl.createPermission(this, app, app.CREATOR_ROLE(), this);
-        // app.addUtils(utils);
         app.load(100000000000000);
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
+        acl.grantPermission(root, app, app.CREATOR_ROLE());
         acl.grantPermission(voting, tokenManager, tokenManager.MINT_ROLE());
-        // acl.createPermission(app, tokenManager, tokenManager.BURN_ROLE(), this);
+        acl.grantPermission(app, tokenManager, tokenManager.BURN_ROLE());
 
         // Clean up permissions
         acl.grantPermission(root, dao, dao.APP_MANAGER_ROLE());
@@ -110,10 +109,14 @@ contract Template is TemplateBase, TimeHelpers {
         acl.revokePermission(this, acl, acl.CREATE_PERMISSIONS_ROLE());
         acl.setPermissionManager(root, acl, acl.CREATE_PERMISSIONS_ROLE());
 
-        acl.grantPermission(root, app, app.CREATOR_ROLE());
-        acl.setPermissionManager(root, app, app.CREATOR_ROLE());
-
         acl.revokePermission(this, tokenManager, tokenManager.MINT_ROLE());
+        acl.setPermissionManager(voting, tokenManager, tokenManager.MINT_ROLE());
+
+        acl.revokePermission(this, tokenManager, tokenManager.BURN_ROLE());
+        acl.setPermissionManager(voting, tokenManager, tokenManager.BURN_ROLE());
+
+        acl.revokePermission(this, app, app.CREATOR_ROLE());
+        acl.setPermissionManager(voting, app, app.CREATOR_ROLE());
 
         emit DeployInstance(dao);
     }
