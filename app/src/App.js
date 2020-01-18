@@ -6,6 +6,7 @@ import { Main, Text } from '@aragon/ui';
 import AuctionInformation from './containers/AuctionInformation';
 import AuctionRounds from './containers/AuctionRounds';
 import ControlPanel from './containers/ControlPanel';
+import Welcome from './components/Welcome'
 import useAuctionRoundNumber from './hooks/auction-round-number';
 
 function App() {
@@ -17,9 +18,10 @@ function App() {
     <Main>
       <AppContainer>
         <Header>
-          <Text size="xlarge">cyber~Auction</Text>
+          <Text size="xxlarge">Dashboard</Text>
           <ControlPanel currentRound={currentRound} />
         </Header>
+        <Welcome />
         {isSyncing && <Syncing />}
         <AuctionInformation currentRound={currentRound} />
         <AuctionRoundsTable currentRound={currentRound} />

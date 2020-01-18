@@ -22,7 +22,7 @@ function AuctionDetails({
       <TableRow>
         <TableHeader colSpan="5">
           <Text color={theme.textSecondary} size="xsmall">
-            Auction information
+            Auction Information
           </Text>
         </TableHeader>
       </TableRow>
