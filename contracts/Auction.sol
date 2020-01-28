@@ -104,6 +104,9 @@ contract Auction is AragonApp, DSMath {
         return day == 0 ? createFirstDay : createPerDay;
     }
 
+    /**
+     * @notice Deposit ETH to Auction for `day` round
+     */
     function buyWithLimit(uint256 day, uint256 limit) public payable loaded {
         assert(time() >= openTime && today() <= numberOfDays);
         assert(msg.value >= 0.01 ether);
@@ -121,10 +124,16 @@ contract Auction is AragonApp, DSMath {
         emit LogBuy(day, msg.sender, msg.value);
     }
 
+    /**
+     * @notice Deposit ETH to Auction for current round
+     */
     function buy() public payable loaded {
         buyWithLimit(today(), 0);
     }
 
+    /**
+     * @notice Receive bought on round `day` tokens to your account.
+     */
     function claim(uint256 day) public loaded {
         assert(today() > day);
 
@@ -143,6 +152,9 @@ contract Auction is AragonApp, DSMath {
         emit LogClaim(day, msg.sender, reward);
     }
 
+    /**
+     * @notice Receive all bought tokens to your account.
+     */
     function claimAll() public loaded {
         for (uint256 i = 0; i < today(); i++) {
             claim(i);
