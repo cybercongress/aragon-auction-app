@@ -32,10 +32,10 @@ app.store(async (state, { event, returnValues, blockNumber, address }) => {
     case events.SYNC_STATUS_SYNCED:
       nextState = { ...nextState, isSyncing: false };
       break;
-    case 'LogLoaded':
-      return handleLogLoaded(nextState);
-    case 'LogBuy':
-      return handleLogBuy(nextState, returnValues);
+    case 'Loaded':
+      return handleLoaded(nextState);
+    case 'Buy':
+      return handleBuy(nextState, returnValues);
     default:
       return state;
   }
@@ -50,7 +50,7 @@ async function updateConnectedAccount(state, { account }) {
   };
 }
 
-async function handleLogBuy(state, { window, user, amount }) {
+async function handleBuy(state, { window, user, amount }) {
   const { rounds = {}, totalRaisedByRound = {}, totalRaised = '0' } = state;
   const round = rounds[window] || {};
   const raisedInRound = totalRaisedByRound[window] || '0';
@@ -82,7 +82,7 @@ async function handleLogBuy(state, { window, user, amount }) {
   };
 }
 
-async function handleLogLoaded(state) {
+async function handleLoaded(state) {
   const [
     openTime,
     startTime,

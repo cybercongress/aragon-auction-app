@@ -1,8 +1,13 @@
 {
   "roles": [
     {
-      "name": "Load the Auction",
+      "name": "Initialize auction",
       "id": "CREATOR_ROLE",
+      "params": []
+    },
+    {
+      "name": "Burn dust",
+      "id": "BURNER_ROLE",
       "params": []
     }
   ],

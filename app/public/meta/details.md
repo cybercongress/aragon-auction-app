@@ -1,6 +1,6 @@
-An application for Aragon.
+The cyber~Auction application.
 
-**Features**
-- Feature \#1.
-- Feature \#2.
-- Feature \#3.
+## Features:
+- Buy tokens
+- Claim tokens
+- Collect ETH to foundation

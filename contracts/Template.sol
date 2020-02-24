@@ -92,11 +92,13 @@ contract Template is TemplateBase, TimeHelpers {
         tokenManager.mint(app, 200000000000000);
 
         acl.createPermission(this, app, app.CREATOR_ROLE(), this);
+        acl.createPermission(this, app, app.BURNER_ROLE(), this);
         app.load(100000000000000);
 
         acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
 
         acl.grantPermission(root, app, app.CREATOR_ROLE());
+        acl.grantPermission(root, app, app.BURNER_ROLE());
         acl.grantPermission(voting, tokenManager, tokenManager.MINT_ROLE());
         acl.grantPermission(app, tokenManager, tokenManager.BURN_ROLE());
 
@@ -117,6 +119,9 @@ contract Template is TemplateBase, TimeHelpers {
 
         acl.revokePermission(this, app, app.CREATOR_ROLE());
         acl.setPermissionManager(voting, app, app.CREATOR_ROLE());
+
+        acl.revokePermission(this, app, app.BURNER_ROLE());
+        acl.setPermissionManager(voting, app, app.BURNER_ROLE());
 
         emit DeployInstance(dao);
     }

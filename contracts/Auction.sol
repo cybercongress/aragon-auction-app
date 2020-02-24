@@ -9,16 +9,26 @@ import "./misc/DSMath.sol";
 
 contract Auction is AragonApp, DSMath {
 
-    // /// Events
-    event LogBuy (uint256 window, address indexed user, uint256 amount);
-    event LogClaim (uint256 window, address indexed user, uint256 amount);
-    event LogCollect (uint256 amount);
-    event LogPrice (uint256 price);
-    event LogLoaded();
-    event LogBurn();
+    /// Events
+    event Buy (
+        uint256 indexed window,
+        address indexed user,
+        uint256 amount
+    );
+
+    event Claim (
+        uint256 indexed window,
+        address indexed user,
+        uint256 amount
+    );
+
+    event Collect (uint256 amount);
+    event Price   (uint256 price);
+    event Loaded  (uint256 createFirstDay, uint256 createPerDay);
+    event Burn    (uint256 dust);
 
     /// State
-    MiniMeToken public token;
+    MiniMeToken  public token;
     TokenManager public tokenManager;
 
     uint256 public openTime;
@@ -33,12 +43,13 @@ contract Auction is AragonApp, DSMath {
 
     mapping (uint256 => uint256) public dailyTotals;
     mapping (uint256 => mapping (address => uint256)) public userBuys;
-    mapping (uint256 => mapping (address => bool)) public claimed;
+    mapping (uint256 => mapping (address => bool))    public claimed;
 
     /// ACL
     bytes32 constant public CREATOR_ROLE = keccak256("CREATOR_ROLE");
+    bytes32 constant public BURNER_ROLE  = keccak256("BURNER_ROLE");
 
-    // /// ERRORS
+    /// ERRORS
     string private constant ERROR_NOT_LOADED = "NOT_LOADED";
 
     /// Modifiers
@@ -54,7 +65,9 @@ contract Auction is AragonApp, DSMath {
         address _token,
         address _foundation,
         address _tokenManager
-    ) public onlyInit
+    )
+        public
+        onlyInit
     {
         numberOfDays = _numberOfDays;
         openTime = _openTime;
@@ -73,6 +86,7 @@ contract Auction is AragonApp, DSMath {
     }
 
     function load(uint256 _createFirstDay) public auth(CREATOR_ROLE) {
+        assert(createFirstDay == 0 && createPerDay == 0);
         uint256 selfBalance = token.balanceOf(address(this));
 
         createFirstDay = _createFirstDay;
@@ -81,7 +95,7 @@ contract Auction is AragonApp, DSMath {
         assert(createFirstDay > 0);
         assert(createPerDay > 0);
 
-        emit LogLoaded();
+        emit Loaded(createFirstDay, createPerDay);
     }
 
     function addUtils(address _utils) public auth(CREATOR_ROLE) {
@@ -96,32 +110,32 @@ contract Auction is AragonApp, DSMath {
         return dayFor(time());
     }
 
-    function dayFor(uint256 timestamp) public view returns (uint256) {
-        return timestamp < startTime ? 0 : sub(timestamp, startTime) / 1 hours + 1;
+    function dayFor(uint256 _timestamp) public view returns (uint256) {
+        return _timestamp < startTime ? 0 : sub(_timestamp, startTime) / 1 hours + 1;
     }
 
-    function createOnDay(uint256 day) public view returns (uint256) {
-        return day == 0 ? createFirstDay : createPerDay;
+    function createOnDay(uint256 _day) public view returns (uint256) {
+        return _day == 0 ? createFirstDay : createPerDay;
     }
 
     /**
-     * @notice Deposit ETH to Auction for `day` round
+     * @notice Deposit ETH to Auction for `_day` round
      */
-    function buyWithLimit(uint256 day, uint256 limit) public payable loaded {
+    function buyWithLimit(uint256 _day, uint256 _limit) public payable loaded {
         assert(time() >= openTime && today() <= numberOfDays);
         assert(msg.value >= 0.01 ether);
 
-        assert(day >= today());
-        assert(day <= numberOfDays);
+        assert(_day >= today());
+        assert(_day <= numberOfDays);
 
-        userBuys[day][msg.sender] += msg.value;
-        dailyTotals[day] += msg.value;
+        userBuys[_day][msg.sender] += msg.value;
+        dailyTotals[_day] += msg.value;
 
-        if (limit != 0) {
-            assert(dailyTotals[day] <= limit);
+        if (_limit != 0) {
+            assert(dailyTotals[_day] <= _limit);
         }
 
-        emit LogBuy(day, msg.sender, msg.value);
+        emit Buy(_day, msg.sender, msg.value);
     }
 
     /**
@@ -132,24 +146,24 @@ contract Auction is AragonApp, DSMath {
     }
 
     /**
-     * @notice Receive bought on round `day` tokens to your account.
+     * @notice Receive bought on round `_day` tokens to your account.
      */
-    function claim(uint256 day) public loaded {
-        assert(today() > day);
+    function claim(uint256 _day) public loaded {
+        assert(today() > _day);
 
-        if (claimed[day][msg.sender] || dailyTotals[day] == 0) {
+        if (claimed[_day][msg.sender] || dailyTotals[_day] == 0) {
             return;
         }
 
-        uint256 price = wdiv(createOnDay(day), dailyTotals[day]);
-        uint256 reward = wmul(price, userBuys[day][msg.sender]);
+        uint256 price = wdiv(createOnDay(_day), dailyTotals[_day]);
+        uint256 reward = wmul(price, userBuys[_day][msg.sender]);
         reward = sub(reward, 1);
 
-        claimed[day][msg.sender] = true;
+        claimed[_day][msg.sender] = true;
         token.transfer(msg.sender, reward);
 
-        emit LogPrice(price);
-        emit LogClaim(day, msg.sender, reward);
+        emit Price(price);
+        emit Claim(_day, msg.sender, reward);
     }
 
     /**
@@ -163,18 +177,17 @@ contract Auction is AragonApp, DSMath {
 
     function collect() public loaded {
         assert(today() > 0);
+        emit Collect(address(this).balance);
         address(foundation).transfer(address(this).balance);
-
-        emit LogCollect(address(this).balance);
     }
 
-    function burnDust() public loaded auth(CREATOR_ROLE) {
+    function burnDust() public loaded auth(BURNER_ROLE) {
         assert(today() > numberOfDays + 1);
         uint256 dust = token.balanceOf(address(this));
 
         assert(dust > 0);
         tokenManager.burn(address(this), dust);
 
-        emit LogBurn();
+        emit Burn(dust);
     }
 }
