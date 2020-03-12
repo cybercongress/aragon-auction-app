@@ -19,14 +19,12 @@ function getUserBuys(currentRound, address, rounds) {
   return round[address];
 }
 
-function  getUserReward(price, userBuys) {
+function getUserReward(price, userBuys) {
   if (!price || !userBuys || price == '0' || userBuys == '0') {
     return null;
   }
 
-  const reward = toBN(userBuys)
-    .div(toBN(price))
-    .toNumber()
+  const reward = userBuys/price
   return (
     Math.round(reward-1)
   );
@@ -77,7 +75,7 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
               round,
               round === 0 ? createFirstRound : createPerRound,
               raised || '0',
-              currentPrice || '0',
+              Math.round(currentPrice) || '0',
               userBuys || '0',
               reward || '0',
             ];
@@ -93,7 +91,7 @@ function AuctionRounds({ style = {}, currentRound, ...props }) {
             <Text>{round}</Text>,
             <Text>{distributed}</Text>,
             <Text>{formatCurrency(raised, 4)}</Text>,
-            <Text>{fromWei(toBN(currentPrice).toString(), 'ether')}</Text>,
+            <Text>{Number.parseFloat(fromWei(toBN(currentPrice), 'ether')).toFixed(18)}</Text>,
             <AuctionClosing currentRound={currentRound} round={round} />,
             <Text>{formatCurrency(userBuys, 4)}</Text>,
             <Text>{reward}</Text>,

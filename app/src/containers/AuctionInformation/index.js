@@ -23,7 +23,7 @@ function AuctionInformation({ currentRound, ...props }) {
   const { appState } = useAragonApi();
   const { numberOfRounds, totalRaised } = appState;
   const timeLeft = useAuctionRoundTimer(currentRound);
-  const currentPrice = useAuctionRoundPrice(currentRound);
+  const currentPrice = Math.round(useAuctionRoundPrice(currentRound));
   const cap = getCap(currentPrice);
 
   return (

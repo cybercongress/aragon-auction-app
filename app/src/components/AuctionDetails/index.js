@@ -56,7 +56,7 @@ function AuctionDetails({
             <Text size="xxlarge">
               {isEmpty(currentPrice)
                 ? PLACEHOLDER
-                : fromWei(toBN(currentPrice).toString(), 'ether') }
+                : Number.parseFloat(fromWei(toBN(currentPrice), 'ether')).toFixed(18)}
             </Text>
           </div>
         </TableCell>
