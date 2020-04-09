@@ -111,7 +111,7 @@ contract Auction is AragonApp, DSMath {
     }
 
     function dayFor(uint256 _timestamp) public view returns (uint256) {
-        return _timestamp < startTime ? 0 : sub(_timestamp, startTime) / 1 hours + 1;
+        return _timestamp < startTime ? 0 : sub(_timestamp, startTime) / 23 hours + 1;
     }
 
     function createOnDay(uint256 _day) public view returns (uint256) {
@@ -182,7 +182,7 @@ contract Auction is AragonApp, DSMath {
     }
 
     function burnDust() public loaded auth(BURNER_ROLE) {
-        assert(today() > numberOfDays + 1);
+        assert(today() > numberOfDays + 7);
         uint256 dust = token.balanceOf(address(this));
 
         assert(dust > 0);
