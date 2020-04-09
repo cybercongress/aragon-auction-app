@@ -13,7 +13,7 @@ const getCap = currentPrice => {
     return null;
   }
 
-  const thc = Math.pow(10, 15);
+  const thc = 15 * Math.pow(10, 12);
   const capWei = toBN(thc).mul(toBN(currentPrice));
   return fromWei(toBN(capWei).toString(), 'ether');
 
