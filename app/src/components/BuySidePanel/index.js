@@ -29,7 +29,7 @@ function BuySidePanel({
   return (
     <SidePanel title="Buy" opened={opened} onClose={onClose}>
       <WindowTitle size="xsmall" color={theme.textSecondary}>
-        Window <span style={{ color: theme.accent }}>*</span>
+        Round <span style={{ color: theme.accent }}>*</span>
       </WindowTitle>
       <WindowInput
         type="number"
@@ -39,7 +39,7 @@ function BuySidePanel({
         onChange={e => setWindow(e.target.value)}
       />
       <AmountTitle size="xsmall" color={theme.textSecondary}>
-        Amount <span style={{ color: theme.accent }}>*</span>
+        Amount, ETH <span style={{ color: theme.accent }}>*</span>
       </AmountTitle>
       <AmountInput
         type="number"
